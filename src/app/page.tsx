@@ -16,8 +16,8 @@ export default async function LandingPage() {
       <header className="fixed inset-x-0 top-0 z-40 px-5 pt-4">
         <div className="glass-deep mx-auto flex max-w-5xl items-center justify-between rounded-2xl px-4 py-2.5">
           <span className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-sage/40 to-sky/25 border border-white/15">
-              <PawPrint className="h-4 w-4 text-sage" />
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-accent/40 to-sky/25 border border-white/15">
+              <PawPrint className="h-4 w-4 text-accent" />
             </span>
             <span className="font-display text-[17px] font-bold tracking-tight">Pawkind</span>
           </span>
@@ -31,12 +31,12 @@ export default async function LandingPage() {
       {/* hero */}
       <section className="relative mx-auto flex max-w-6xl flex-col items-center px-5 pt-36 pb-16 text-center sm:pt-44">
         <div className="animate-rise">
-          <span className="chip !py-1.5 !px-4 text-sage border-sage/30 bg-sage/10">
+          <span className="chip !py-1.5 !px-4 text-accent border-accent/30 bg-accent/10">
             <Sparkles className="h-3.5 w-3.5" /> The pet-centered social ecosystem
           </span>
         </div>
         <h1 className="animate-rise mt-6 max-w-3xl font-display text-[42px] leading-[1.04] font-bold tracking-tight text-white sm:text-6xl md:text-7xl" style={{ animationDelay: "80ms" }}>
-          Pets deserve their<br />own <span className="bg-gradient-to-r from-sage via-sky to-sand bg-clip-text text-transparent">digital world</span>
+          Pets deserve their<br />own <span className="bg-gradient-to-r from-accent via-sky to-sand bg-clip-text text-transparent">digital world</span>
         </h1>
         <p className="animate-rise text-dim mt-6 max-w-xl text-base leading-relaxed sm:text-lg" style={{ animationDelay: "160ms" }}>
           You manage the account. Your pet becomes the identity. Social profiles, reels and stories,
@@ -67,9 +67,9 @@ export default async function LandingPage() {
               ))}
             </div>
             <div className="divider my-4" />
-            <div className="flex items-center gap-2.5 rounded-xl bg-sage/10 border border-sage/25 px-3.5 py-3">
-              <Sparkles className="h-4 w-4 shrink-0 text-sage" />
-              <p className="text-[13px] leading-snug text-sage/90">Ask the AI assistant anything about health, training, nutrition or behavior.</p>
+            <div className="flex items-center gap-2.5 rounded-xl bg-accent/10 border border-accent/25 px-3.5 py-3">
+              <Sparkles className="h-4 w-4 shrink-0 text-accent" />
+              <p className="text-[13px] leading-snug text-accent/90">Ask the AI assistant anything about health, training, nutrition or behavior.</p>
             </div>
           </div>
 
@@ -79,7 +79,7 @@ export default async function LandingPage() {
             <p className="text-faint mt-1.5 text-[11px] leading-snug">Events, meetups, walks, clinics and services in your city.</p>
           </div>
           <div className="glass animate-rise absolute -right-2 top-0 hidden w-44 rotate-6 rounded-2xl p-3.5 sm:block md:-right-10" style={{ animationDelay: "500ms" }}>
-            <div className="flex items-center gap-2 text-xs font-semibold text-white/85"><ShieldCheck className="h-3.5 w-3.5 text-sage" /> Health vault</div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-white/85"><ShieldCheck className="h-3.5 w-3.5 text-accent" /> Health vault</div>
             <p className="text-faint mt-1.5 text-[11px] leading-snug">Private by default. Vaccinations, meds, weight and vet visits.</p>
           </div>
           <div className="glass animate-rise absolute -bottom-6 left-6 hidden w-44 -rotate-3 rounded-2xl p-3.5 sm:block" style={{ animationDelay: "580ms" }}>
@@ -99,10 +99,10 @@ export default async function LandingPage() {
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { icon: MessagesSquare, tint: "text-sage", bg: "from-sage/15", title: "Pet-first social", body: "Posts, reels and stories where the pet is the author. Follow friends, message pet-to-pet, build their circle." },
+            { icon: MessagesSquare, tint: "text-accent", bg: "from-accent/15", title: "Pet-first social", body: "Posts, reels and stories where the pet is the author. Follow friends, message pet-to-pet, build their circle." },
             { icon: Sparkles, tint: "text-sky", bg: "from-sky/15", title: "AI care assistant", body: "Guidance on health, behavior, training and nutrition — aware of your pet's profile, honest about its limits." },
             { icon: CalendarHeart, tint: "text-clay", bg: "from-clay/15", title: "Events & meetups", body: "Group walks, park meetups, birthdays and adoption events, discovered by city with one-tap directions." },
-            { icon: Stethoscope, tint: "text-sage", bg: "from-sage/15", title: "Clinics & services", body: "Find verified groomers, trainers, sitters and veterinary clinics near you — no more scattered searching." },
+            { icon: Stethoscope, tint: "text-accent", bg: "from-accent/15", title: "Clinics & services", body: "Find verified groomers, trainers, sitters and veterinary clinics near you — no more scattered searching." },
             { icon: ShieldCheck, tint: "text-sky", bg: "from-sky/15", title: "Private health vault", body: "Vaccinations, medications, allergies and weight history, locked to your account. Your data stays yours." },
             { icon: HeartHandshake, tint: "text-clay", bg: "from-clay/15", title: "Adoption & rescue", body: "A dedicated space for shelters and rescues to help pets find homes, discovered by city and nearby." },
           ].map((f, i) => (
@@ -117,7 +117,7 @@ export default async function LandingPage() {
         </div>
 
         <div className="glass-deep glass-sheen animate-rise mt-16 rounded-[32px] p-10 text-center sm:p-14">
-          <PawPrint className="mx-auto h-8 w-8 text-sage" />
+          <PawPrint className="mx-auto h-8 w-8 text-accent" />
           <h2 className="card-title mt-4 text-2xl font-bold tracking-tight sm:text-3xl">Their world starts with a profile</h2>
           <p className="text-dim mx-auto mt-2.5 max-w-md text-sm leading-relaxed">
             Create an account, pick your city, and introduce your pet. It takes about a minute.

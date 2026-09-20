@@ -22,7 +22,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     id: p.id,
     name: p.name,
     username: p.username,
-    icon: animalIcon(p.animalType === "other" ? "paw" : p.animalType),
+    icon: p.identityIcon || animalIcon(p.animalType),
     avatar: fileUrl(p.avatarFileId),
   });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -9,13 +9,14 @@ import {
 } from "lucide-react";
 import { cn, formatCount, timeAgo, isBirthdayToday } from "@/lib/utils";
 import type { FeedPost, PetLite, StoryGroup } from "@/lib/queries";
-import { PetAvatar } from "@/components/ui";
+import { PetAvatar, OwnerAvatar } from "@/components/ui";
 import { IdentityBadge, StarBadge, BirthdayBadge } from "@/components/pet-identity";
 import {
   toggleLikeAction, toggleSaveAction, toggleRepostAction, addCommentAction,
-  deleteCommentAction, deletePostAction, updatePostCaptionAction, followAction,
+  deleteCommentAction, toggleCommentLikeAction, deletePostAction, updatePostCaptionAction, followAction,
   toggleBlockAction, reportAction,
 } from "@/actions/content";
+import type { CommentWithMeta } from "@/actions/content";
 import { openConversationAction, sendMessageAction } from "@/actions/messages";
 import { searchPetsAction } from "@/actions/pets";
 import { Composer } from "@/components/composer";
@@ -52,7 +53,7 @@ export function RichText({ text, className }: { text: string; className?: string
           return <Link key={i} href={`/search?q=${encodeURIComponent(part)}&tab=content`} className="font-semibold text-sky/90 hover:text-sky transition-colors">{part}</Link>;
         }
         if (part.startsWith("@")) {
-          return <Link key={i} href={`/profile/${part.slice(1).toLowerCase()}`} className="font-semibold text-sage hover:text-sage/80 transition-colors">{part}</Link>;
+          return <Link key={i} href={`/profile/${part.slice(1).toLowerCase()}`} className="font-semibold text-accent hover:text-accent/80 transition-colors">{part}</Link>;
         }
         return <span key={i}>{part}</span>;
       })}
@@ -119,7 +120,7 @@ function SendSheet({ post, onClose }: { post: FeedPost; onClose: () => void }) {
                     toast.success(`Sent to ${p.name}.`);
                   } else toast.error(res.error ?? "Could not send.");
                 })}
-                className={cn("btn-ghost !px-3 !py-1.5 text-xs", sent.has(p.id) && "!border-sage/40 !text-sage")}
+                className={cn("btn-ghost !px-3 !py-1.5 text-xs", sent.has(p.id) && "!border-accent/40 !text-accent")}
               >
                 {sent.has(p.id) ? <Check className="h-3.5 w-3.5" /> : "Send"}
               </button>
@@ -169,18 +170,16 @@ export function ReportSheet({ targetType, targetId, onClose }: { targetType: str
 
 /* ─── Comments ───────────────────────────────── */
 
-type CommentData = { id: string; text: string; parentId: string | null; createdAt: string; author: PetLite };
-
-function CommentsPanel({ postId, me, onCountChange }: { postId: string; me: PetLite; onCountChange: (n: number) => void }) {
-  const [comments, setComments] = useState<CommentData[] | null>(null);
+export function CommentsPanel({ postId, me, meOwner, onCountChange }: { postId: string; me: PetLite; meOwner: string; onCountChange: (n: number) => void }) {
+  const [comments, setComments] = useState<CommentWithMeta[] | null>(null);
   const [text, setText] = useState("");
-  const [replyTo, setReplyTo] = useState<CommentData | null>(null);
+  const [replyTo, setReplyTo] = useState<CommentWithMeta | null>(null);
   const [pending, start] = useTransition();
 
   useEffect(() => {
     let alive = true;
     import("@/actions/content").then((m) => m.getCommentsAction(postId)).then((rows) => {
-      if (alive) setComments(rows as CommentData[]);
+      if (alive) setComments(rows);
     }).catch(() => alive && setComments([]));
     return () => { alive = false; };
   }, [postId]);
@@ -194,8 +193,9 @@ function CommentsPanel({ postId, me, onCountChange }: { postId: string; me: PetL
     start(async () => {
       const res = await addCommentAction(postId, text, replyTo?.id);
       if (res.ok) {
-        const optimistic: CommentData = {
-          id: crypto.randomUUID(), text: text.trim(), parentId: replyTo?.id ?? null, createdAt: new Date().toISOString(), author: me,
+        const optimistic: CommentWithMeta = {
+          id: crypto.randomUUID(), text: text.trim(), parentId: replyTo?.id ?? null, createdAt: new Date().toISOString(),
+          likeCount: 0, viewerLiked: false, ownerName: meOwner, author: me,
         };
         setComments((c) => [...(c ?? []), optimistic]);
         onCountChange(list.length + 1);
@@ -204,16 +204,55 @@ function CommentsPanel({ postId, me, onCountChange }: { postId: string; me: PetL
     });
   };
 
-  const Item = ({ c, isReply }: { c: CommentData; isReply?: boolean }) => (
+  const toggleLike = (c: CommentWithMeta) => {
+    const next = !c.viewerLiked;
+    setComments((prev) => (prev ?? []).map((x) =>
+      x.id === c.id ? { ...x, viewerLiked: next, likeCount: x.likeCount + (next ? 1 : -1) } : x,
+    ));
+    start(async () => {
+      try {
+        const res = await toggleCommentLikeAction(c.id);
+        setComments((prev) => (prev ?? []).map((x) =>
+          x.id === c.id ? { ...x, viewerLiked: res.liked, likeCount: res.likeCount } : x,
+        ));
+      } catch {
+        setComments((prev) => (prev ?? []).map((x) => (x.id === c.id ? c : x)));
+        toast.error("Couldn't update like.");
+      }
+    });
+  };
+
+  const renderItem = (c: CommentWithMeta, isReply?: boolean) => (
     <div className={cn("group flex gap-2.5", isReply && "ml-10")}>
-      <PetAvatar avatarFileId={c.author.avatar ? c.author.avatar.replace("/api/file/", "") : null} name={c.author.name} icon={c.author.icon} size="xs" />
+      <Link href={`/profile/${c.author.username}`} title={`@${c.author.username}`} className="shrink-0 transition-opacity hover:opacity-80">
+        <OwnerAvatar name={c.ownerName} size="xs" />
+      </Link>
       <div className="min-w-0 flex-1">
         <div className="glass-hair inline-block max-w-full rounded-2xl px-3 py-2">
-          <Link href={`/profile/${c.author.username}`} className="text-xs font-bold text-white/90 hover:text-sage transition-colors">{c.author.name}</Link>
+          <Link
+            href={`/profile/${c.author.username}`}
+            title={`@${c.author.username}`}
+            className="text-xs font-bold text-white/90 hover:text-accent transition-colors"
+          >
+            {c.ownerName}
+          </Link>
           <RichText text={c.text} className="text-[13px] text-white/80" />
         </div>
         <div className="mt-1 flex items-center gap-3 pl-1">
           <span className="text-faint text-[11px]">{timeAgo(c.createdAt)}</span>
+          <button
+            onClick={() => toggleLike(c)}
+            aria-label={c.viewerLiked ? "Unlike comment" : "Like comment"}
+            aria-pressed={c.viewerLiked}
+            className={cn(
+              "flex items-center gap-1 text-[11px] font-bold transition-all active:scale-90",
+              c.viewerLiked ? "text-clay" : "text-faint hover:text-white/70",
+            )}
+          >
+            <Heart className={cn("h-3.5 w-3.5 transition-all", c.viewerLiked && "fill-clay")} />
+            {c.likeCount > 0 && <span className="tabular-nums">{formatCount(c.likeCount)}</span>}
+            <span className="sr-only">Like</span>
+          </button>
           {!isReply && <button className="text-faint hover:text-white/70 text-[11px] font-semibold transition-colors" onClick={() => setReplyTo(c)}>Reply</button>}
           {c.author.id === me.id && (
             <button className="text-faint hover:text-clay text-[11px] font-semibold opacity-0 transition-opacity group-hover:opacity-100"
@@ -238,20 +277,20 @@ function CommentsPanel({ postId, me, onCountChange }: { postId: string; me: PetL
         {comments !== null && roots.length === 0 && <p className="text-faint py-3 text-center text-xs">No comments yet — start the conversation.</p>}
         {roots.map((c) => (
           <div key={c.id} className="space-y-2.5">
-            <Item c={c} />
-            {replies(c.id).map((r) => <Item key={r.id} c={r} isReply />)}
+            {renderItem(c)}
+            {replies(c.id).map((r) => <Fragment key={r.id}>{renderItem(r, true)}</Fragment>)}
           </div>
         ))}
       </div>
       <div className="mt-3">
         {replyTo && (
-          <div className="mb-1.5 flex items-center justify-between rounded-lg bg-sage/10 px-2.5 py-1.5 text-[11px] text-sage">
-            Replying to {replyTo.author.name}
+          <div className="mb-1.5 flex items-center justify-between rounded-lg bg-accent/10 px-2.5 py-1.5 text-[11px] text-accent">
+            Replying to {replyTo.ownerName}
             <button onClick={() => setReplyTo(null)} aria-label="Cancel reply"><X className="h-3 w-3" /></button>
           </div>
         )}
         <form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <input value={text} onChange={(e) => setText(e.target.value)} className="field !py-2.5 text-sm" placeholder={`Comment as ${me.name}…`} maxLength={500} />
+          <input value={text} onChange={(e) => setText(e.target.value)} className="field !py-2.5 text-sm" placeholder={`Comment as ${meOwner}…`} maxLength={500} enterKeyHint="send" />
           <button type="submit" disabled={pending || !text.trim()} className="btn-primary !rounded-xl !p-2.5" aria-label="Send comment">
             {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </button>
@@ -263,7 +302,7 @@ function CommentsPanel({ postId, me, onCountChange }: { postId: string; me: PetL
 
 /* ─── Post card ──────────────────────────────── */
 
-export function PostCard({ post, me }: { post: FeedPost; me: PetLite }) {
+export function PostCard({ post, me, meOwner }: { post: FeedPost; me: PetLite; meOwner: string }) {
   const router = useRouter();
   const [liked, setLiked] = useState(post.viewerLiked);
   const [likes, setLikes] = useState(post.likeCount);
@@ -355,7 +394,7 @@ export function PostCard({ post, me }: { post: FeedPost; me: PetLite }) {
 
       {/* media */}
       {post.media.length > 0 && (
-        <div className="relative select-none" onDoubleClick={like} role="button" aria-label="Like" tabIndex={0}>
+        <div className="on-dark relative select-none" onDoubleClick={like} role="button" aria-label="Like" tabIndex={0}>
           <div className={cn("relative overflow-hidden bg-black/40", post.kind === "reel" ? "aspect-[4/5]" : "aspect-square sm:aspect-[4/3]")}>
             <MediaItem key={mediaIndex} url={post.media[mediaIndex].url} />
             {burst && (
@@ -402,8 +441,8 @@ export function PostCard({ post, me }: { post: FeedPost; me: PetLite }) {
           <button
             onClick={() => { const next = !reposted; setReposted(next); setReposts((n) => n + (next ? 1 : -1)); start(async () => { try { const r = await toggleRepostAction(post.id); setReposted(r.reposted); if (r.reposted) toast.success("Reposted to your profile narrative."); } catch { setReposted(!next); setReposts((n) => n + (next ? -1 : 1)); } }); }}
             className="group flex items-center gap-1.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-white/6" aria-label="Repost">
-            <Repeat2 className={cn("h-5.5 w-5.5 transition-all group-active:scale-75", reposted ? "text-sage" : "text-white/75 group-hover:text-white")} />
-            <span className={cn("text-sm font-bold tabular-nums", reposted ? "text-sage" : "text-white/75")}>{formatCount(reposts)}</span>
+            <Repeat2 className={cn("h-5.5 w-5.5 transition-all group-active:scale-75", reposted ? "text-accent" : "text-white/75 group-hover:text-white")} />
+            <span className={cn("text-sm font-bold tabular-nums", reposted ? "text-accent" : "text-white/75")}>{formatCount(reposts)}</span>
           </button>
           <button
             onClick={() => { const next = !saved; setSaved(next); start(async () => { try { const r = await toggleSaveAction(post.id); setSaved(r.saved); toast.success(r.saved ? "Saved." : "Removed from saved."); } catch { setSaved(!next); } }); }}
@@ -428,7 +467,7 @@ export function PostCard({ post, me }: { post: FeedPost; me: PetLite }) {
             </div>
           ) : caption ? (
             <div className="text-sm leading-relaxed text-white/85">
-              <Link href={`/profile/${post.author.username}`} className="mr-1.5 inline-block font-bold text-white/95 hover:text-sage transition-colors">{post.author.name}</Link>
+              <Link href={`/profile/${post.author.username}`} className="mr-1.5 inline-block font-bold text-white/95 hover:text-accent transition-colors">{post.author.name}</Link>
               <RichText text={caption} className="inline" />
             </div>
           ) : null}
@@ -441,7 +480,7 @@ export function PostCard({ post, me }: { post: FeedPost; me: PetLite }) {
 
         {showComments && (
           <div className="border-t border-white/7 pb-4 pt-3 animate-fade">
-            <CommentsPanel postId={post.id} me={me} onCountChange={setCommentCount} />
+            <CommentsPanel postId={post.id} me={me} meOwner={meOwner} onCountChange={setCommentCount} />
           </div>
         )}
       </div>
@@ -485,7 +524,7 @@ export function StoriesRail({ groups, me, city }: { groups: StoryGroup[]; me: Pe
       <button onClick={() => setCreateOpen(true)} className="group flex w-17 shrink-0 flex-col items-center gap-1.5">
         <span className="story-ring-seen relative transition-transform duration-300 group-hover:scale-105">
           <PetAvatar avatarFileId={me.avatar ? me.avatar.replace("/api/file/", "") : null} name={me.name} icon={me.icon} size="lg" />
-          <span className="absolute bottom-0 right-0 flex h-5.5 w-5.5 items-center justify-center rounded-full bg-sage text-ink shadow-md ring-2 ring-ink">
+          <span className="absolute bottom-0 right-0 flex h-5.5 w-5.5 items-center justify-center rounded-full bg-accent text-on-accent shadow-md ring-2 ring-ink">
             <Plus className="h-3 w-3" strokeWidth={3} />
           </span>
         </span>
@@ -536,7 +575,7 @@ function StoryViewer({ group, onClose }: { group: StoryGroup; onClose: () => voi
 
   return (
     <div className="modal-veil fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-6 animate-fade" onClick={onClose}>
-      <div className="relative flex h-full w-full max-w-sm flex-col overflow-hidden bg-black sm:h-[86dvh] sm:rounded-[26px] sm:border sm:border-white/10 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+      <div className="on-dark relative flex h-full w-full max-w-sm flex-col overflow-hidden bg-black sm:h-[86dvh] sm:rounded-[26px] sm:border sm:border-white/10 animate-scale-in" onClick={(e) => e.stopPropagation()}>
         {/* progress */}
         <div className="absolute inset-x-3 top-3 z-20 flex gap-1">
           {group.stories.map((_, i) => (

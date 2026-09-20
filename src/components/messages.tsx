@@ -52,10 +52,10 @@ export function MessagesApp({
         <div className="flex items-center justify-between border-b border-white/7 px-4 py-3.5">
           <div className="flex gap-1.5">
             <button onClick={() => setTab("inbox")} className="chip !py-1.5" data-active={tab === "inbox"}>
-              <Inbox className="h-3.5 w-3.5" /> Inbox {inbox.filter((c) => c.unread).length > 0 && <span className="ml-0.5 rounded-full bg-clay px-1.5 text-[9px] font-bold text-white">{inbox.filter((c) => c.unread).length}</span>}
+              <Inbox className="h-3.5 w-3.5" /> Inbox {inbox.filter((c) => c.unread).length > 0 && <span className="on-dark ml-0.5 rounded-full bg-clay px-1.5 text-[9px] font-bold text-white">{inbox.filter((c) => c.unread).length}</span>}
             </button>
             <button onClick={() => setTab("requests")} className="chip !py-1.5" data-active={tab === "requests"}>
-              Requests {requests.length > 0 && <span className="ml-0.5 rounded-full bg-sand/80 px-1.5 text-[9px] font-bold text-ink">{requests.length}</span>}
+              Requests {requests.length > 0 && <span className="ml-0.5 rounded-full bg-sand/80 px-1.5 text-[9px] font-bold text-on-sand">{requests.length}</span>}
             </button>
           </div>
           <button onClick={() => setNewOpen(true)} className="glass-hair flex h-8 w-8 items-center justify-center rounded-xl transition-colors hover:bg-white/10" aria-label="New conversation">
@@ -78,7 +78,7 @@ export function MessagesApp({
           )}
           {list.map((c) => (
             <button key={c.id} onClick={() => openConv(c.id)}
-              className={cn("flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors", c.id === activeId ? "bg-sage/12" : "hover:bg-white/5")}>
+              className={cn("flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors", c.id === activeId ? "bg-accent/12" : "hover:bg-white/5")}>
               {c.isGroup ? (
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky/15 border border-sky/25"><Users className="h-4.5 w-4.5 text-sky" /></span>
               ) : (
@@ -93,7 +93,7 @@ export function MessagesApp({
                 </span>
                 <span className={cn("mt-0.5 block truncate text-xs", c.unread ? "font-semibold text-white/75" : "text-faint")}>{c.lastText}</span>
               </span>
-              {c.unread && <span className="h-2 w-2 shrink-0 rounded-full bg-sage shadow-[0_0_8px_2px_rgba(143,185,154,0.5)]" />}
+              {c.unread && <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(143,185,220,0.5)]" />}
             </button>
           ))}
         </div>
@@ -103,8 +103,8 @@ export function MessagesApp({
       <section className={cn("flex min-h-0 flex-col", !activeId && "hidden md:flex")}>
         {!detail ? (
           <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-            <span className="glass-sheen mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sage/20 to-sky/12 border border-white/10">
-              <Send className="h-5.5 w-5.5 text-sage/80" />
+            <span className="glass-sheen mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-sky/12 border border-white/10">
+              <Send className="h-5.5 w-5.5 text-accent/80" />
             </span>
             <p className="text-sm font-bold text-white/85">Pick a conversation</p>
             <p className="text-faint mt-1 max-w-2xs text-xs leading-relaxed">Pet-to-pet messages, shared posts and voice of the community — all in one place.</p>
@@ -242,7 +242,7 @@ function Thread({ me, detail, onBack }: { me: PetLite; detail: ConvDetail; onBac
                 {showSender && <p className="text-faint mb-1 pl-1 text-[10px] font-bold">{m.sender.name}</p>}
                 <div className={cn(
                   "overflow-hidden rounded-2xl",
-                  m.mine ? "bg-gradient-to-br from-sage/85 to-sage-deep/85 text-ink rounded-br-md" : "glass-hair text-white/88 rounded-bl-md",
+                  m.mine ? "bg-gradient-to-br from-accent/85 to-accent-deep/85 text-on-accent rounded-br-md" : "glass-hair text-white/88 rounded-bl-md",
                 )}>
                   {m.shared && (
                     <Link href={`/profile/${m.shared.authorUsername}`} className="block border-b border-white/10 bg-black/20 p-2.5">
@@ -252,8 +252,8 @@ function Thread({ me, detail, onBack }: { me: PetLite; detail: ConvDetail; onBac
                           <img src={m.shared.media[0]} alt="" className="h-12 w-12 rounded-lg object-cover" />
                         )}
                         <div className="min-w-0">
-                          <p className={cn("text-[11px] font-bold", m.mine ? "text-ink/80" : "text-white/80")}>{m.shared.authorName}'s {m.shared.kind}</p>
-                          <p className={cn("truncate text-[11px]", m.mine ? "text-ink/60" : "text-white/55")}>{m.shared.caption || "Shared post"}</p>
+                          <p className={cn("text-[11px] font-bold", m.mine ? "text-on-accent-soft" : "text-white/80")}>{m.shared.authorName}'s {m.shared.kind}</p>
+                          <p className={cn("truncate text-[11px]", m.mine ? "text-on-accent-faint" : "text-white/55")}>{m.shared.caption || "Shared post"}</p>
                         </div>
                       </div>
                     </Link>
@@ -352,7 +352,7 @@ function NewConversation({ me, onClose }: { me: PetLite; onClose: () => void }) 
         {selected.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {selected.map((p) => (
-              <button key={p.id} onClick={() => togglePick(p)} className="chip !border-sage/40 !bg-sage/12 !text-sage">
+              <button key={p.id} onClick={() => togglePick(p)} className="chip !border-accent/40 !bg-accent/12 !text-accent">
                 {p.name} <X className="h-3 w-3" />
               </button>
             ))}

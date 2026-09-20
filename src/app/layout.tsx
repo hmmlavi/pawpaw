@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Sora, Inter } from "next/font/google";
-import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToaster } from "@/components/theme-toaster";
 import "./globals.css";
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-display", weight: ["400", "500", "600", "700", "800"] });
@@ -16,31 +17,28 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  colorScheme: "dark light",
 };
+
+// Runs before first paint so the saved/system theme applies without flashing.
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('pawkind-theme')||'system';var r=t==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;document.documentElement.dataset.theme=r;if(r==='dark'){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}document.documentElement.style.colorScheme=r;}catch(e){document.documentElement.dataset.theme='dark';}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className={`${sora.variable} ${inter.variable} min-h-dvh`}>
-        <div className="ambient" aria-hidden>
-          <div className="ambient-blob a" />
-          <div className="ambient-blob b" />
-          <div className="ambient-blob c" />
-        </div>
-        {children}
-        <Toaster
-          theme="dark"
-          position="top-center"
-          toastOptions={{
-            style: {
-              background: "rgba(18,20,24,0.9)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              backdropFilter: "blur(16px)",
-              color: "#e9eae6",
-              borderRadius: "14px",
-            },
-          }}
-        />
+        <ThemeProvider>
+          <div className="ambient" aria-hidden>
+            <div className="ambient-blob a" />
+            <div className="ambient-blob b" />
+            <div className="ambient-blob c" />
+          </div>
+          {children}
+          <ThemeToaster />
+        </ThemeProvider>
       </body>
     </html>
   );

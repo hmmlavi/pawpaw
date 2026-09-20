@@ -1,6 +1,22 @@
+"use client";
+
+import { useState } from "react";
 import { cn, fileUrl } from "@/lib/utils";
 import { AnimalIcon } from "./pet-identity";
 import Link from "next/link";
+
+/** Accepts either a file id or a full /api/file/… URL (or blob/data URL for previews). */
+function resolveAvatarUrl(avatarFileId?: string | null): string | null {
+  if (!avatarFileId) return null;
+  if (
+    avatarFileId.startsWith("/api/file/") ||
+    avatarFileId.startsWith("blob:") ||
+    avatarFileId.startsWith("data:")
+  ) {
+    return avatarFileId;
+  }
+  return fileUrl(avatarFileId);
+}
 
 export function PetAvatar({
   avatarFileId,
@@ -15,7 +31,9 @@ export function PetAvatar({
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   className?: string;
 }) {
-  const url = fileUrl(avatarFileId);
+  const url = resolveAvatarUrl(avatarFileId);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const failed = url !== null && failedUrl === url;
   const sizes = {
     xs: "h-7 w-7 text-[10px]",
     sm: "h-9 w-9 text-xs",
@@ -33,12 +51,70 @@ export function PetAvatar({
         className,
       )}
     >
-      {url ? (
+      {url && !failed ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt={name} className="h-full w-full object-cover" />
+        <img
+          src={url}
+          alt={name}
+          className="h-full w-full object-cover"
+          draggable={false}
+          loading="lazy"
+          onError={() => url && setFailedUrl(url)}
+        />
       ) : (
         <AnimalIcon icon={icon} className={cn("text-sage/70", iconSizes[size])} />
       )}
+    </span>
+  );
+}
+
+const OWNER_GRADIENTS = [
+  "from-accent/30 to-sky/20",
+  "from-sage/30 to-accent/20",
+  "from-clay/30 to-sand/20",
+  "from-sand/30 to-clay/20",
+  "from-sky/30 to-sage/20",
+];
+
+/** Personal-account avatar: initials derived from the owner's real display name. */
+export function OwnerAvatar({
+  name,
+  size = "sm",
+  className,
+}: {
+  name: string;
+  size?: "xs" | "sm" | "md" | "lg";
+  className?: string;
+}) {
+  const sizes = {
+    xs: "h-7 w-7 text-[10px]",
+    sm: "h-9 w-9 text-xs",
+    md: "h-11 w-11 text-sm",
+    lg: "h-16 w-16 text-lg",
+  } as const;
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || "?";
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
+  const gradient = OWNER_GRADIENTS[Math.abs(hash) % OWNER_GRADIENTS.length];
+  return (
+    <span
+      title={name}
+      className={cn(
+        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full",
+        "bg-gradient-to-br border border-white/10 font-display font-bold text-white/90",
+        gradient,
+        sizes[size],
+        className,
+      )}
+    >
+      {initials}
     </span>
   );
 }
@@ -85,7 +161,7 @@ export function SectionHeader({ title, sub, href, linkLabel }: { title: string; 
         {sub && <p className="text-faint mt-0.5 text-xs">{sub}</p>}
       </div>
       {href && (
-        <Link href={href} className="text-sage/90 hover:text-sage text-xs font-semibold whitespace-nowrap transition-colors">
+        <Link href={href} className="text-accent/90 hover:text-accent text-xs font-semibold whitespace-nowrap transition-colors">
           {linkLabel ?? "See all"} →
         </Link>
       )}

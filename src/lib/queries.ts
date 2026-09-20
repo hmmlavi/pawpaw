@@ -1,8 +1,8 @@
 import "server-only";
 import { db } from "@/db";
 import {
-  posts, pets, likes, comments, saves, reposts, follows, blocks,
-  events, eventAttendees, businesses, adoptions, notifications,
+  posts, pets, likes, comments, commentLikes, saves, reposts, follows, blocks,
+  events, eventAttendees, businesses, adoptions, notifications, users,
   conversations, conversationMembers, messages, healthRecords,
 } from "@/db/schema";
 import { and, desc, eq, gt, inArray, ne, or, ilike, sql, asc } from "drizzle-orm";
@@ -173,11 +173,29 @@ export async function loadReels(viewerPetId: string): Promise<FeedPost[]> {
   return serialized;
 }
 
-export async function loadComments(postId: string) {
-  const rows = await db.select({ comment: comments, pet: pets }).from(comments).innerJoin(pets, eq(pets.id, comments.petId))
+export async function loadComments(postId: string, viewerPetId?: string | null) {
+  const rows = await db.select({ comment: comments, pet: pets, user: users }).from(comments)
+    .innerJoin(pets, eq(pets.id, comments.petId))
+    .innerJoin(users, eq(users.id, pets.userId))
     .where(eq(comments.postId, postId)).orderBy(asc(comments.createdAt)).limit(100);
-  return rows.map(({ comment, pet }) => ({
+  const ids = rows.map((r) => r.comment.id);
+  const likeCounts = new Map<string, number>();
+  const likedByMe = new Set<string>();
+  if (ids.length > 0) {
+    const countRows = await db.select({ commentId: commentLikes.commentId, n: sql<number>`count(*)::int` })
+      .from(commentLikes).where(inArray(commentLikes.commentId, ids)).groupBy(commentLikes.commentId);
+    countRows.forEach((r) => likeCounts.set(r.commentId, r.n));
+    if (viewerPetId) {
+      const mine = await db.select({ commentId: commentLikes.commentId }).from(commentLikes)
+        .where(and(eq(commentLikes.petId, viewerPetId), inArray(commentLikes.commentId, ids)));
+      mine.forEach((r) => likedByMe.add(r.commentId));
+    }
+  }
+  return rows.map(({ comment, pet, user }) => ({
     id: comment.id, text: comment.text, parentId: comment.parentId, createdAt: comment.createdAt.toISOString(),
+    likeCount: likeCounts.get(comment.id) ?? 0,
+    viewerLiked: likedByMe.has(comment.id),
+    ownerName: user.displayName,
     author: toPetLite(pet),
   }));
 }

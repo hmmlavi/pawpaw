@@ -4,7 +4,7 @@ import { MessagesApp } from "@/components/messages";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Messages" };
+export const metadata = { title: "Chat" };
 
 export default async function MessagesPage({ searchParams }: { searchParams: Promise<{ c?: string }> }) {
   const ctx = await getActiveContext();
@@ -18,7 +18,7 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
     <div>
       <header className="mb-4 animate-rise">
         <p className="text-faint text-[11px] font-semibold uppercase tracking-[0.18em]">Pet-to-pet</p>
-        <h1 className="card-title mt-1 text-[26px] font-bold leading-tight text-white/95">Messages</h1>
+        <h1 className="card-title mt-1 text-[26px] font-bold leading-tight text-white/95">Chat</h1>
       </header>
       <MessagesApp
         me={toPetLite(ctx.activePet)}

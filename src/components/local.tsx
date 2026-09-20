@@ -34,7 +34,7 @@ export function EventAttendanceButton({ eventId, initial, disabled }: { eventId:
       <button
         disabled={pending || disabled}
         onClick={() => start(async () => { const r = await toggleEventAttendanceAction(eventId, "going"); setState(r.state); if (r.state === "going") toast.success("You're going!"); })}
-        className={cn("chip !py-2", state === "going" && "!border-sage/50 !bg-sage/15 !text-sage")}
+        className={cn("chip !py-2", state === "going" && "!border-accent/50 !bg-accent/15 !text-accent")}
       >
         {state === "going" && <Check className="h-3.5 w-3.5" />} Going
       </button>
@@ -74,7 +74,7 @@ export function EventCard({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`/api/file/${e.imageFileId}`} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          <span className="absolute left-4 top-4 chip !cursor-default !border-white/20 bg-black/45 !text-white backdrop-blur-md !py-1 text-[10px]">{eventCategoryLabel(e.category)}</span>
+          <span className="on-dark absolute left-4 top-4 chip !cursor-default !border-white/20 bg-black/45 !text-white backdrop-blur-md !py-1 text-[10px]">{eventCategoryLabel(e.category)}</span>
         </div>
       )}
       <div className="p-4.5">
@@ -196,7 +196,7 @@ export function CreateEventModal({ city, onClose }: { city: string; onClose: () 
           </div>
           <div>
             <label className="label">Event image (optional)</label>
-            <button type="button" onClick={() => imgRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/16 bg-white/3 py-5 transition-colors hover:border-sage/40">
+            <button type="button" onClick={() => imgRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/16 bg-white/3 py-5 transition-colors hover:border-accent/40">
               {imagePreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={imagePreview} alt="" className="h-24 w-full rounded-xl object-cover" />
@@ -238,12 +238,12 @@ export function BusinessCard({ b, isOwner }: { b: Biz; isOwner: boolean }) {
     <>
       <button onClick={() => setOpen(true)} className="glass glass-sheen glass-hover animate-rise group w-full overflow-hidden rounded-[26px] text-left">
         <div className="flex items-center gap-3.5 p-4.5">
-          <span className="flex h-13 w-13 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-sage/20 to-sky/12 border border-white/10">
+          <span className="flex h-13 w-13 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent/20 to-sky/12 border border-white/10">
             {b.imageFileId ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={`/api/file/${b.imageFileId}`} alt="" className="h-full w-full object-cover" />
             ) : (
-              <span className="font-display text-lg font-bold text-sage">{b.name[0]}</span>
+              <span className="font-display text-lg font-bold text-accent">{b.name[0]}</span>
             )}
           </span>
           <span className="min-w-0 flex-1">
@@ -262,11 +262,11 @@ export function BusinessCard({ b, isOwner }: { b: Biz; isOwner: boolean }) {
           <div className="glass-deep max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-t-[26px] p-5 sm:rounded-[26px] animate-scale-in" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3.5">
-                <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-sage/20 to-sky/12 border border-white/10">
+                <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent/20 to-sky/12 border border-white/10">
                   {b.imageFileId ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={`/api/file/${b.imageFileId}`} alt="" className="h-full w-full object-cover" />
-                  ) : <span className="font-display text-xl font-bold text-sage">{b.name[0]}</span>}
+                  ) : <span className="font-display text-xl font-bold text-accent">{b.name[0]}</span>}
                 </span>
                 <div>
                   <p className="flex items-center gap-1.5 text-lg font-bold text-white/93">{b.name} {b.verified && <VerifiedBadge />}</p>
@@ -285,9 +285,9 @@ export function BusinessCard({ b, isOwner }: { b: Biz; isOwner: boolean }) {
             <div className="space-y-2.5 text-sm">
               {b.hours && <p className="flex items-center gap-2.5 text-white/75"><Clock className="text-faint h-4 w-4 shrink-0" /> {b.hours}</p>}
               {b.address && <p className="flex items-center gap-2.5 text-white/75"><MapPin className="text-faint h-4 w-4 shrink-0" /> {b.address}, {b.city}</p>}
-              {b.phone && <a href={`tel:${b.phone}`} className="flex items-center gap-2.5 text-white/75 transition-colors hover:text-sage"><Phone className="text-faint h-4 w-4 shrink-0" /> {b.phone}</a>}
-              {b.email && <a href={`mailto:${b.email}`} className="flex items-center gap-2.5 text-white/75 transition-colors hover:text-sage"><Mail className="text-faint h-4 w-4 shrink-0" /> {b.email}</a>}
-              {b.website && <a href={b.website.startsWith("http") ? b.website : `https://${b.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-white/75 transition-colors hover:text-sage"><Globe className="text-faint h-4 w-4 shrink-0" /> Website</a>}
+              {b.phone && <a href={`tel:${b.phone}`} className="flex items-center gap-2.5 text-white/75 transition-colors hover:text-accent"><Phone className="text-faint h-4 w-4 shrink-0" /> {b.phone}</a>}
+              {b.email && <a href={`mailto:${b.email}`} className="flex items-center gap-2.5 text-white/75 transition-colors hover:text-accent"><Mail className="text-faint h-4 w-4 shrink-0" /> {b.email}</a>}
+              {b.website && <a href={b.website.startsWith("http") ? b.website : `https://${b.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-white/75 transition-colors hover:text-accent"><Globe className="text-faint h-4 w-4 shrink-0" /> Website</a>}
               {b.emergency && <p className="flex items-center gap-2.5 font-semibold text-clay"><Siren className="h-4 w-4 shrink-0" /> Emergency care available</p>}
             </div>
 
@@ -392,7 +392,7 @@ export function CreateBusinessModal({ city, onClose }: { city: string; onClose: 
           </label>
           <div>
             <label className="label">Photo / logo</label>
-            <button type="button" onClick={() => imgRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/16 bg-white/3 py-5 transition-colors hover:border-sage/40">
+            <button type="button" onClick={() => imgRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/16 bg-white/3 py-5 transition-colors hover:border-accent/40">
               {imagePreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={imagePreview} alt="" className="h-20 w-20 rounded-xl object-cover" />
@@ -440,12 +440,12 @@ export function AdoptionCard({ a, isOwner }: { a: Adoption; isOwner: boolean }) 
           ) : (
             <div className="flex h-full items-center justify-center"><HeartHandshake className="text-faint h-8 w-8" /></div>
           )}
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3.5 pt-10">
+          <div className="on-dark absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3.5 pt-10">
             <p className="font-display text-lg font-bold text-white">{a.name}</p>
             <p className="text-[11px] text-white/70">{animalLabel(a.animalType)}{a.breed ? ` · ${a.breed}` : ""}{a.ageText ? ` · ${a.ageText}` : ""}</p>
           </div>
           {a.status === "adopted" && (
-            <span className="absolute left-3 top-3 rounded-full bg-sage px-2.5 py-1 text-[10px] font-bold text-ink">Adopted!</span>
+            <span className="absolute left-3 top-3 rounded-full bg-accent px-2.5 py-1 text-[10px] font-bold text-on-accent">Adopted!</span>
           )}
         </div>
       </button>
@@ -458,7 +458,7 @@ export function AdoptionCard({ a, isOwner }: { a: Adoption; isOwner: boolean }) 
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={`/api/file/${a.imageFileId}`} alt={a.name} className="h-full w-full object-cover" />
               ) : <div className="flex h-full items-center justify-center"><HeartHandshake className="text-faint h-10 w-10" /></div>}
-              <button onClick={() => setOpen(false)} className="glass-hair absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-xl !bg-black/40" aria-label="Close"><X className="h-4 w-4" /></button>
+              <button onClick={() => setOpen(false)} className="on-dark glass-hair absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-xl !border-white/20 !bg-black/40 !text-white backdrop-blur-md" aria-label="Close"><X className="h-4 w-4" /></button>
             </div>
             <div className="p-5">
               <h3 className="card-title text-xl font-bold text-white/95">{a.name}</h3>
@@ -468,14 +468,14 @@ export function AdoptionCard({ a, isOwner }: { a: Adoption; isOwner: boolean }) 
               <p className="mt-1 flex items-center gap-1 text-xs text-white/55"><MapPin className="h-3.5 w-3.5 text-clay" />{a.city}</p>
               {a.description && <p className="text-dim mt-4 text-sm leading-relaxed">{a.description}</p>}
               {a.status === "available" ? (
-                <div className="mt-5 rounded-2xl border border-sage/25 bg-sage/8 p-4">
-                  <p className="text-xs font-bold text-sage">Interested in adopting {a.name}?</p>
+                <div className="mt-5 rounded-2xl border border-accent/25 bg-accent/8 p-4">
+                  <p className="text-xs font-bold text-accent">Interested in adopting {a.name}?</p>
                   <p className="mt-1 break-all text-sm text-white/85">{a.contact}</p>
                   <p className="text-faint mt-2 text-[11px]">Reach out directly — Pawkind never charges adoption fees through the app.</p>
                 </div>
               ) : (
-                <div className="mt-5 rounded-2xl border border-sage/25 bg-sage/8 p-4 text-center">
-                  <p className="text-sm font-bold text-sage">{a.name} found a home!</p>
+                <div className="mt-5 rounded-2xl border border-accent/25 bg-accent/8 p-4 text-center">
+                  <p className="text-sm font-bold text-accent">{a.name} found a home!</p>
                 </div>
               )}
               {isOwner && (
@@ -567,7 +567,7 @@ export function CreateAdoptionModal({ city, onClose }: { city: string; onClose: 
           </div>
           <div>
             <label className="label">Photo</label>
-            <button type="button" onClick={() => imgRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/16 bg-white/3 py-5 transition-colors hover:border-sage/40">
+            <button type="button" onClick={() => imgRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/16 bg-white/3 py-5 transition-colors hover:border-accent/40">
               {imagePreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={imagePreview} alt="" className="h-24 w-full rounded-xl object-cover" />

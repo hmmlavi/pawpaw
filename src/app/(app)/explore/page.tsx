@@ -90,7 +90,7 @@ export default async function ExplorePage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={post.media[0].url} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-sage/20 via-ink-3 to-sky/15 p-4">
+                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-accent/20 via-ink-3 to-sky/15 p-4">
                       <p className="line-clamp-4 text-center font-display text-sm font-semibold text-white/85">{post.caption}</p>
                     </div>
                   )}
@@ -113,7 +113,7 @@ export default async function ExplorePage() {
           <div className="glass glass-sheen rounded-3xl p-4 animate-rise">
             <div className="mb-3 flex items-center gap-2"><CalendarHeart className="h-4 w-4 text-sand" /><span className="text-xs font-bold uppercase tracking-wider text-sand/90">Next event</span></div>
             {explore.localEvents.length === 0 ? (
-              <p className="text-faint py-4 text-center text-xs leading-relaxed">Nothing nearby yet.<br /><Link href="/events?create=1" className="text-sage font-semibold hover:underline">Host the first one →</Link></p>
+              <p className="text-faint py-4 text-center text-xs leading-relaxed">Nothing nearby yet.<br /><Link href="/events?create=1" className="text-accent font-semibold hover:underline">Host the first one →</Link></p>
             ) : (
               (() => { const e = explore.localEvents[0]; return (
                 <Link href="/events" className="block">
@@ -127,9 +127,9 @@ export default async function ExplorePage() {
           </div>
           {/* service card */}
           <div className="glass glass-sheen rounded-3xl p-4 animate-rise" style={{ animationDelay: "60ms" }}>
-            <div className="mb-3 flex items-center gap-2"><Store className="h-4 w-4 text-sage" /><span className="text-xs font-bold uppercase tracking-wider text-sage/90">Services</span></div>
+            <div className="mb-3 flex items-center gap-2"><Store className="h-4 w-4 text-accent" /><span className="text-xs font-bold uppercase tracking-wider text-accent/90">Services</span></div>
             {explore.localBusinesses.length === 0 ? (
-              <p className="text-faint py-4 text-center text-xs leading-relaxed">No local businesses listed yet.<br /><Link href="/services?create=1" className="text-sage font-semibold hover:underline">List yours →</Link></p>
+              <p className="text-faint py-4 text-center text-xs leading-relaxed">No local businesses listed yet.<br /><Link href="/services?create=1" className="text-accent font-semibold hover:underline">List yours →</Link></p>
             ) : (
               (() => { const b = explore.localBusinesses[0]; return (
                 <Link href="/services" className="block">
@@ -148,7 +148,7 @@ export default async function ExplorePage() {
           <div className="glass glass-sheen rounded-3xl p-4 animate-rise" style={{ animationDelay: "120ms" }}>
             <div className="mb-3 flex items-center gap-2"><HeartHandshake className="h-4 w-4 text-clay" /><span className="text-xs font-bold uppercase tracking-wider text-clay/90">Adoption</span></div>
             {explore.localAdoptions.length === 0 ? (
-              <p className="text-faint py-4 text-center text-xs leading-relaxed">No listings nearby yet.<br /><Link href="/adoption?create=1" className="text-sage font-semibold hover:underline">Help a pet →</Link></p>
+              <p className="text-faint py-4 text-center text-xs leading-relaxed">No listings nearby yet.<br /><Link href="/adoption?create=1" className="text-accent font-semibold hover:underline">Help a pet →</Link></p>
             ) : (
               (() => { const a = explore.localAdoptions[0]; return (
                 <Link href="/adoption" className="block">

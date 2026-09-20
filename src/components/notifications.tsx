@@ -12,13 +12,13 @@ import { PetAvatar } from "@/components/ui";
 import { markNotificationsReadAction } from "@/actions/content";
 
 const ICONS: Record<string, { icon: React.ComponentType<{ className?: string }>; tint: string; bg: string }> = {
-  follow: { icon: UserPlus, tint: "text-sage", bg: "bg-sage/15" },
+  follow: { icon: UserPlus, tint: "text-accent", bg: "bg-accent/15" },
   follow_request: { icon: Clock, tint: "text-sand", bg: "bg-sand/15" },
-  follow_accept: { icon: UserPlus, tint: "text-sage", bg: "bg-sage/15" },
+  follow_accept: { icon: UserPlus, tint: "text-accent", bg: "bg-accent/15" },
   like: { icon: Heart, tint: "text-clay", bg: "bg-clay/15" },
   comment: { icon: MessageCircle, tint: "text-sky", bg: "bg-sky/15" },
-  mention: { icon: AtSign, tint: "text-sage", bg: "bg-sage/15" },
-  repost: { icon: Repeat2, tint: "text-sage", bg: "bg-sage/15" },
+  mention: { icon: AtSign, tint: "text-accent", bg: "bg-accent/15" },
+  repost: { icon: Repeat2, tint: "text-accent", bg: "bg-accent/15" },
   share: { icon: Send, tint: "text-sky", bg: "bg-sky/15" },
   message: { icon: Send, tint: "text-sky", bg: "bg-sky/15" },
   message_request: { icon: Clock, tint: "text-sand", bg: "bg-sand/15" },
@@ -55,7 +55,7 @@ export function NotificationsClient({ notification: n }: { notification: Notif }
       href={hrefFor(n)}
       className={cn(
         "flex items-start gap-3 rounded-2xl px-3 py-3 transition-colors hover:bg-white/5",
-        !n.read && "bg-sage/6",
+        !n.read && "bg-accent/6",
       )}
     >
       <span className="relative shrink-0">
@@ -74,7 +74,7 @@ export function NotificationsClient({ notification: n }: { notification: Notif }
         <span className="block text-sm leading-snug text-white/85">{n.body}</span>
         <span className="text-faint mt-0.5 block text-[11px]">{timeAgo(n.createdAt)}</span>
       </span>
-      {!n.read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sage" />}
+      {!n.read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" />}
     </Link>
   );
 }

@@ -3,7 +3,7 @@ import { loadProfile, toPetLite } from "@/lib/queries";
 import { notFound, redirect } from "next/navigation";
 import { PetAvatar } from "@/components/ui";
 import { IdentityBadge, StarBadge, BirthdayBadge, AnimalIcon } from "@/components/pet-identity";
-import { ProfileActions, RequestsPanel, FollowListTrigger } from "@/components/profile";
+import { ProfileActions, RequestsPanel, FollowListTrigger, BannerEditFab, type EditablePet } from "@/components/profile";
 import { ProfileTabs, PrivateProfileGate } from "@/components/profile-tabs";
 import { isBirthdayToday, petAge, animalLabel, cn } from "@/lib/utils";
 import { MapPin, Cake, Dna, Heart, Bone, Gamepad2 } from "lucide-react";
@@ -21,26 +21,43 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   const { pet } = profile;
   const bday = isBirthdayToday(pet.birthday);
   const age = petAge(pet.birthday);
+  const editable: EditablePet = {
+    ...pet,
+    bio: profile.bio,
+    breed: profile.breed,
+    breedNote: profile.breedNote,
+    gender: profile.gender,
+    personality: profile.personality,
+    interests: profile.interests,
+    favoriteFood: profile.favoriteFood,
+    favoriteToys: profile.favoriteToys,
+    favoriteActivities: profile.favoriteActivities,
+    birthday: pet.birthday,
+    customAnimal: profile.customAnimal,
+    city: pet.city,
+    cover: profile.cover,
+  };
 
   return (
     <div>
       {/* ── Identity space ─────────────────────── */}
       <section className="glass-deep glass-sheen animate-rise relative overflow-hidden rounded-[30px]">
         {/* cover */}
-        <div className="relative h-36 sm:h-48">
+        <div className="relative h-44 sm:h-60">
           {profile.cover ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.cover} alt="" className="h-full w-full object-cover" />
+            <img src={profile.cover} alt={`${pet.name}'s banner`} className="h-full w-full object-cover" />
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-sage/22 via-[#14161b] to-sky/18" />
+            <div className="h-full w-full bg-gradient-to-br from-sage/22 via-ink-3 to-sky/18" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#10121680] to-transparent" />
           {bday && (
-            <div className="absolute inset-x-4 top-4 flex items-center gap-2.5 rounded-2xl border border-clay/30 bg-black/45 px-4 py-2.5 backdrop-blur-md animate-rise">
+            <div className="on-dark absolute inset-x-4 top-4 flex items-center gap-2.5 rounded-2xl border border-clay/30 bg-black/45 px-4 py-2.5 backdrop-blur-md animate-rise">
               <Cake className="h-4 w-4 shrink-0 text-clay" />
-              <p className="text-xs font-semibold text-white/90">It's {pet.name}'s birthday — say something nice!</p>
+              <p className="text-xs font-semibold text-white/90">It&apos;s {pet.name}&apos;s birthday — say something nice!</p>
             </div>
           )}
+          {profile.viewerOwns && <BannerEditFab pet={editable} />}
         </div>
 
         <div className="relative px-5 pb-5 sm:px-6">
@@ -134,7 +151,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
         ) : profile.canView ? (
           <ProfileTabs
             posts={profile.posts} reels={profile.reels} tagged={profile.tagged} saved={profile.saved}
-            me={toPetLite(ctx.activePet)} viewerOwns={profile.viewerOwns} name={pet.name}
+            me={toPetLite(ctx.activePet)} meOwner={ctx.user.displayName} viewerOwns={profile.viewerOwns} name={pet.name}
           />
         ) : (
           <PrivateProfileGate />

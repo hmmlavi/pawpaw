@@ -18,8 +18,8 @@ type Message = { id: string; role: string; content: string; pending?: boolean };
 const QUICK = [
   { icon: HeartPulse, label: "Health", tint: "text-clay", prompt: "I have a health question about my pet: " },
   { icon: HelpCircle, label: "Behavior", tint: "text-sky", prompt: "I'd like to understand my pet's behavior — they're showing signs of " },
-  { icon: Dumbbell, label: "Training", tint: "text-sage", prompt: "Help me with training. I want to work on " },
-  { icon: Leaf, label: "Nutrition", tint: "text-sage", prompt: "Nutrition question: is it okay for my pet to eat " },
+  { icon: Dumbbell, label: "Training", tint: "text-accent", prompt: "Help me with training. I want to work on " },
+  { icon: Leaf, label: "Nutrition", tint: "text-accent", prompt: "Nutrition question: is it okay for my pet to eat " },
   { icon: Scissors, label: "Grooming", tint: "text-sky", prompt: "Grooming question: how should I handle " },
   { icon: Baby, label: "Care", tint: "text-sand", prompt: "Everyday care question — how much " },
 ];
@@ -149,8 +149,8 @@ export function AiChat({
 
         {/* clinics link */}
         <Link href="/services?cat=clinic" className="glass flex items-center gap-3 rounded-3xl p-4 animate-rise transition-colors hover:bg-white/6" style={{ animationDelay: "180ms" }}>
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sage/15 border border-sage/30">
-            <Stethoscope className="h-4.5 w-4.5 text-sage" />
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent/15 border border-accent/30">
+            <Stethoscope className="h-4.5 w-4.5 text-accent" />
           </span>
           <span>
             <span className="block text-sm font-bold text-white/90">Local clinics</span>
@@ -164,7 +164,7 @@ export function AiChat({
             <p className="text-faint px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.16em]">Recent</p>
             <div className="max-h-52 space-y-0.5 overflow-y-auto">
               {conversations.map((c) => (
-                <div key={c.id} className={cn("group flex items-center gap-1 rounded-xl transition-colors", c.id === conversationId ? "bg-sage/12" : "hover:bg-white/5")}>
+                <div key={c.id} className={cn("group flex items-center gap-1 rounded-xl transition-colors", c.id === conversationId ? "bg-accent/12" : "hover:bg-white/5")}>
                   <Link href={`/ai?c=${c.id}`} className="min-w-0 flex-1 truncate px-3 py-2 text-xs text-white/75">{c.title}</Link>
                   <button onClick={() => start(async () => { await deleteAiConversationAction(c.id); if (c.id === conversationId) { setConversationId(null); setMessages([]); } router.refresh(); })}
                     className="mr-1.5 hidden rounded-lg p-1.5 text-white/35 transition-colors hover:text-clay group-hover:block" aria-label="Delete conversation">
@@ -181,7 +181,7 @@ export function AiChat({
       <section className="glass-deep glass-sheen flex h-[calc(100dvh-11rem)] min-h-[520px] flex-col overflow-hidden rounded-[28px] animate-rise" style={{ animationDelay: "80ms" }}>
         {/* header */}
         <div className="flex items-center gap-3 border-b border-white/7 px-5 py-3.5">
-          <span className="relative flex h-9.5 w-9.5 items-center justify-center rounded-2xl bg-gradient-to-br from-sky/30 to-sage/20 border border-white/10">
+          <span className="relative flex h-9.5 w-9.5 items-center justify-center rounded-2xl bg-gradient-to-br from-sky/30 to-accent/20 border border-white/10">
             <Sparkles className="h-4.5 w-4.5 text-sky" />
             <span className={cn("absolute inset-0 rounded-2xl", thinking && "animate-pulse-ring")} />
           </span>
@@ -200,7 +200,7 @@ export function AiChat({
         <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
           {messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center text-center animate-fade">
-              <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-[22px] bg-gradient-to-br from-sky/25 to-sage/15 border border-white/10">
+              <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-[22px] bg-gradient-to-br from-sky/25 to-accent/15 border border-white/10">
                 <Sparkles className="h-7 w-7 text-sky" />
               </span>
               <h2 className="card-title text-xl font-bold text-white/92">How can I help{pet ? ` with ${pet.name}` : ""}?</h2>
@@ -232,14 +232,14 @@ export function AiChat({
           {messages.map((m) => (
             <div key={m.id} className={cn("flex animate-rise-fast", m.role === "user" ? "justify-end" : "justify-start")}>
               {m.role === "assistant" && (
-                <span className="mr-2.5 mt-1 flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky/30 to-sage/20 border border-white/10">
+                <span className="mr-2.5 mt-1 flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky/30 to-accent/20 border border-white/10">
                   <Sparkles className="h-3.5 w-3.5 text-sky" />
                 </span>
               )}
               <div className={cn(
                 "max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed sm:max-w-[70%]",
                 m.role === "user"
-                  ? "bg-gradient-to-br from-sage/85 to-sage-deep/85 text-ink font-medium rounded-br-md"
+                  ? "bg-gradient-to-br from-accent/85 to-accent-deep/85 text-on-accent font-medium rounded-br-md"
                   : "glass-hair text-white/88 rounded-bl-md",
                 m.pending && "opacity-70",
               )}>
@@ -252,7 +252,7 @@ export function AiChat({
 
           {thinking && (
             <div className="flex justify-start animate-fade">
-              <span className="mr-2.5 mt-1 flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky/30 to-sage/20 border border-white/10 animate-pulse-ring">
+              <span className="mr-2.5 mt-1 flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky/30 to-accent/20 border border-white/10 animate-pulse-ring">
                 <Sparkles className="h-3.5 w-3.5 text-sky" />
               </span>
               <div className="glass-hair flex items-center gap-1.5 rounded-2xl rounded-bl-md px-4 py-3.5">
@@ -266,7 +266,7 @@ export function AiChat({
           {suggestsVet && (
             <div className="flex justify-start animate-rise-fast">
               <Link href="/services?cat=clinic" className="glass flex items-center gap-3 rounded-2xl p-3.5 transition-all hover:-translate-y-0.5 hover:bg-white/7">
-                <Stethoscope className="h-4.5 w-4.5 shrink-0 text-sage" />
+                <Stethoscope className="h-4.5 w-4.5 shrink-0 text-accent" />
                 <span>
                   <span className="block text-xs font-bold text-white/90">Professional care might help</span>
                   <span className="text-faint block text-[11px]">See veterinary clinics near {pet?.city || "you"} →</span>

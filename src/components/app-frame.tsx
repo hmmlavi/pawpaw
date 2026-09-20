@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AppShell, CreateLauncher, type ShellPet } from "./app-shell";
+import { AppShell, type ShellPet } from "./app-shell";
 import { Composer } from "./composer";
 
 export function AppFrame({
@@ -17,13 +17,11 @@ export function AppFrame({
   city: string;
   children: React.ReactNode;
 }) {
-  const [launcherOpen, setLauncherOpen] = useState(false);
   const [composerKind, setComposerKind] = useState<"post" | "reel" | "story" | null>(null);
 
   return (
-    <AppShell activePet={activePet} pets={pets} unread={unread} openComposer={() => setLauncherOpen(true)}>
+    <AppShell activePet={activePet} pets={pets} unread={unread} openComposer={(k) => setComposerKind(k)}>
       {children}
-      <CreateLauncher open={launcherOpen} onClose={() => setLauncherOpen(false)} onPick={(k) => { setLauncherOpen(false); setComposerKind(k); }} />
       {composerKind && activePet && (
         <Composer kind={composerKind} petName={activePet.name} city={city} onClose={() => setComposerKind(null)} />
       )}
