@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { posts, likes, comments, saves, reposts, pets, follows, notifications, blocks } from "@/db/schema";
+import { posts, likes, comments, commentLikes, saves, reposts, pets, users, follows, notifications, blocks } from "@/db/schema";
 import { eq, and, desc, ne, inArray, gt, isNull, or, sql } from "drizzle-orm";
 import { getActiveContext } from "@/lib/auth";
 import { saveUploadedFile } from "@/lib/upload";
@@ -164,6 +164,26 @@ export async function deleteCommentAction(commentId: string): Promise<ActionResu
   return { ok: true };
 }
 
+export async function toggleCommentLikeAction(commentId: string): Promise<{ liked: boolean; likeCount: number }> {
+  const ctx = await requirePet();
+  const petId = ctx.activePet!.id;
+  const [existing] = await db
+    .select()
+    .from(commentLikes)
+    .where(and(eq(commentLikes.petId, petId), eq(commentLikes.commentId, commentId)))
+    .limit(1);
+  if (existing) {
+    await db.delete(commentLikes).where(eq(commentLikes.id, existing.id));
+  } else {
+    await db.insert(commentLikes).values({ petId, commentId });
+  }
+  const [row] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(commentLikes)
+    .where(eq(commentLikes.commentId, commentId));
+  return { liked: !existing, likeCount: row?.n ?? 0 };
+}
+
 export async function toggleSaveAction(postId: string): Promise<{ saved: boolean }> {
   const ctx = await requirePet();
   const [existing] = await db.select().from(saves).where(and(eq(saves.petId, ctx.activePet!.id), eq(saves.postId, postId))).limit(1);
@@ -280,17 +300,40 @@ export async function reportAction(targetType: string, targetId: string, categor
 
 /* ─── Story views (per pet) ────────────────── */
 
-export async function getCommentsAction(postId: string): Promise<{
+export type CommentWithMeta = {
   id: string; text: string; parentId: string | null; createdAt: string;
+  likeCount: number; viewerLiked: boolean;
+  ownerName: string;
   author: { id: string; name: string; username: string; icon: string; avatar: string | null; animalType: string; city: string; isPrivate: boolean; starBadge: boolean; birthday: string | null };
-}[]> {
+};
+
+export async function getCommentsAction(postId: string): Promise<CommentWithMeta[]> {
   const { asc } = await import("drizzle-orm");
-  const rows = await db.select({ comment: comments, pet: pets }).from(comments)
+  const ctx = await getActiveContext();
+  const viewerPetId = ctx?.activePet?.id ?? null;
+  const rows = await db.select({ comment: comments, pet: pets, user: users }).from(comments)
     .innerJoin(pets, eq(pets.id, comments.petId))
+    .innerJoin(users, eq(users.id, pets.userId))
     .where(eq(comments.postId, postId)).orderBy(asc(comments.createdAt)).limit(100);
-  return rows.map(({ comment, pet }) => ({
+  const ids = rows.map((r) => r.comment.id);
+  const likeCounts = new Map<string, number>();
+  const likedByMe = new Set<string>();
+  if (ids.length > 0) {
+    const countRows = await db.select({ commentId: commentLikes.commentId, n: sql<number>`count(*)::int` })
+      .from(commentLikes).where(inArray(commentLikes.commentId, ids)).groupBy(commentLikes.commentId);
+    countRows.forEach((r) => likeCounts.set(r.commentId, r.n));
+    if (viewerPetId) {
+      const mine = await db.select({ commentId: commentLikes.commentId }).from(commentLikes)
+        .where(and(eq(commentLikes.petId, viewerPetId), inArray(commentLikes.commentId, ids)));
+      mine.forEach((r) => likedByMe.add(r.commentId));
+    }
+  }
+  return rows.map(({ comment, pet, user }) => ({
     id: comment.id, text: comment.text, parentId: comment.parentId,
     createdAt: comment.createdAt.toISOString(),
+    likeCount: likeCounts.get(comment.id) ?? 0,
+    viewerLiked: likedByMe.has(comment.id),
+    ownerName: user.displayName,
     author: {
       id: pet.id, name: pet.name, username: pet.username,
       icon: pet.identityIcon || "paw", avatar: pet.avatarFileId ? `/api/file/${pet.avatarFileId}` : null,

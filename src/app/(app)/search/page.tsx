@@ -98,7 +98,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             <div className="glass glass-sheen rounded-3xl p-5 animate-rise">
               <p className="text-faint mb-3 text-[10px] font-bold uppercase tracking-[0.16em]">Jump to</p>
               <div className="flex flex-wrap gap-2">
-                <Link href="/explore" className="chip !py-2"><Compass className="h-3.5 w-3.5 text-sage" /> Explore</Link>
+                <Link href="/explore" className="chip !py-2"><Compass className="h-3.5 w-3.5 text-accent" /> Explore</Link>
                 <Link href="/events" className="chip !py-2"><CalendarHeart className="h-3.5 w-3.5 text-sand" /> Events in {ctx.activePet.city || "your city"}</Link>
                 <Link href="/services?cat=clinic" className="chip !py-2"><Store className="h-3.5 w-3.5 text-sky" /> Find a vet</Link>
                 <Link href="/adoption" className="chip !py-2"><MapPin className="h-3.5 w-3.5 text-clay" /> Adoption near you</Link>
@@ -127,7 +127,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 <EmptyState icon={Search} title={`No content matches “${q}”`} body="Posts and captions from public pets will show up here." />
               ) : (
                 <div className="mx-auto max-w-xl space-y-5">
-                  {contentResults.map((post) => <PostCard key={post.id} post={post} me={me} />)}
+                  {contentResults.map((post) => <PostCard key={post.id} post={post} me={me} meOwner={ctx.user.displayName} />)}
                 </div>
               )
             )}

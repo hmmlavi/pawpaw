@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { PawPrint, MapPin, ArrowRight, ArrowLeft, Loader2, Check, Camera, Calendar, Lock, Globe, Sparkles, CircleCheck } from "lucide-react";
+import { PawPrint, MapPin, ArrowRight, ArrowLeft, Loader2, Check, Camera, Calendar, Lock, Globe, Sparkles, CircleCheck, Crop } from "lucide-react";
 import { ANIMAL_TYPES, cn } from "@/lib/utils";
 import { AnimalIcon } from "@/components/pet-identity";
 import { checkUsernameAction, createPetAction } from "@/actions/pets";
+import { ImageEditor } from "@/components/image-editor";
 import { toast } from "sonner";
 
 const PERSONALITY = ["Playful", "Calm", "Curious", "Goofy", "Shy", "Brave", "Cuddly", "Independent", "Energetic", "Gentle", "Mischievous", "Loyal"];
@@ -35,6 +36,9 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
   const [interests, setInterests] = useState<string[]>([]);
   const [favoriteFood, setFavoriteFood] = useState("");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarOriginal, setAvatarOriginal] = useState<File | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarEditing, setAvatarEditing] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const checkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -77,7 +81,7 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
     fd.set("personality", personality.join(","));
     fd.set("interests", interests.join(","));
     fd.set("favoriteFood", favoriteFood.trim());
-    const file = fileRef.current?.files?.[0];
+    const file = avatarFile ?? fileRef.current?.files?.[0];
     if (file) fd.set("avatar", file);
     start(async () => {
       const res = await createPetAction(fd);
@@ -97,8 +101,8 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
   return (
     <main className="relative mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center px-5 py-10">
       <div className="mb-6 flex items-center gap-2.5 animate-rise">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sage/40 to-sky/25 border border-white/15">
-          <PawPrint className="h-4.5 w-4.5 text-sage" />
+        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent/40 to-sky/25 border border-white/15">
+          <PawPrint className="h-4.5 w-4.5 text-accent" />
         </span>
         <span className="font-display text-xl font-bold tracking-tight">Pawkind</span>
       </div>
@@ -106,7 +110,7 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
       {/* progress */}
       <div className="mb-5 flex items-center gap-1.5">
         {steps.map((s, i) => (
-          <div key={s} className={cn("h-1 w-12 rounded-full transition-all duration-500", i <= step ? "bg-sage" : "bg-white/10", i === step && "animate-pulse-ring")} />
+          <div key={s} className={cn("h-1 w-12 rounded-full transition-all duration-500", i <= step ? "bg-accent" : "bg-white/10", i === step && "animate-pulse-ring")} />
         ))}
       </div>
       <p className="text-faint mb-3 text-[11px] font-semibold tracking-widest uppercase">{steps[step]}</p>
@@ -132,18 +136,33 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
             <p className="text-dim mt-2 text-sm">This becomes their public social identity. They're the star.</p>
 
             <div className="mt-6 flex items-center gap-4">
-              <button type="button" onClick={() => fileRef.current?.click()} className="group relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-dashed border-white/20 bg-white/4 transition-colors hover:border-sage/50">
-                {avatarPreview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={avatarPreview} alt="Pet" className="h-full w-full object-cover" />
-                ) : (
-                  <Camera className="text-faint group-hover:text-sage h-6 w-6 transition-colors" />
+              <div className="relative shrink-0">
+                <button type="button" onClick={() => fileRef.current?.click()} className="group relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-dashed border-white/20 bg-white/4 transition-colors hover:border-accent/50">
+                  {avatarPreview ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={avatarPreview} alt="Pet" className="h-full w-full object-cover" />
+                  ) : (
+                    <Camera className="text-faint group-hover:text-accent h-6 w-6 transition-colors" />
+                  )}
+                  <span className="on-dark absolute inset-x-0 bottom-0 bg-black/50 py-0.5 text-center text-[9px] font-semibold text-white/80 opacity-0 transition-opacity group-hover:opacity-100">Photo</span>
+                </button>
+                {avatarPreview && (
+                  <button
+                    type="button"
+                    onClick={() => avatarOriginal && setAvatarEditing(URL.createObjectURL(avatarOriginal))}
+                    className="absolute -bottom-1 -right-1 flex h-6.5 w-6.5 items-center justify-center rounded-full bg-accent text-on-accent shadow-md ring-2 ring-ink-2"
+                    aria-label="Adjust photo"
+                  >
+                    <Crop className="h-3 w-3" strokeWidth={2.5} />
+                  </button>
                 )}
-                <span className="absolute inset-x-0 bottom-0 bg-black/50 py-0.5 text-center text-[9px] font-semibold text-white/80 opacity-0 transition-opacity group-hover:opacity-100">Photo</span>
-              </button>
+              </div>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (f) setAvatarPreview(URL.createObjectURL(f));
+                if (f) {
+                  setAvatarOriginal(f);
+                  setAvatarEditing(URL.createObjectURL(f));
+                }
               }} />
               <div className="flex-1 space-y-3">
                 <input value={name} onChange={(e) => setName(e.target.value)} className="field" placeholder="Pet's name" maxLength={40} />
@@ -152,7 +171,7 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
                   <input value={username} onChange={(e) => onUsername(e.target.value)} className="field !pl-8 !pr-9" placeholder="username" maxLength={30} />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2">
                     {usernameState === "checking" && <Loader2 className="text-faint h-3.5 w-3.5 animate-spin" />}
-                    {usernameState === "ok" && <Check className="h-3.5 w-3.5 text-sage" />}
+                    {usernameState === "ok" && <Check className="h-3.5 w-3.5 text-accent" />}
                   </span>
                 </div>
               </div>
@@ -164,7 +183,7 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
               {ANIMAL_TYPES.map((a) => (
                 <button key={a.value} type="button" onClick={() => setAnimalType(a.value)}
                   className={cn("flex flex-col items-center gap-1.5 rounded-2xl border px-1 py-3 transition-all duration-300",
-                    animalType === a.value ? "border-sage/50 bg-sage/12 text-sage shadow-[0_8px_24px_-8px_rgba(143,185,154,0.4)]" : "border-white/8 bg-white/3 text-white/55 hover:border-white/20 hover:text-white/85")}>
+                    animalType === a.value ? "border-accent/50 bg-accent/12 text-accent shadow-[0_8px_24px_-8px_rgba(143,185,220,0.4)]" : "border-white/8 bg-white/3 text-white/55 hover:border-white/20 hover:text-white/85")}>
                   <AnimalIcon icon={a.icon} className="h-5 w-5" />
                   <span className="text-[10px] font-semibold leading-none">{a.label}</span>
                 </button>
@@ -238,18 +257,18 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
 
             <div className="mt-6 space-y-3">
               <button type="button" onClick={() => setIsPrivate(false)}
-                className={cn("flex w-full items-start gap-3.5 rounded-2xl border p-4.5 text-left transition-all", !isPrivate ? "border-sage/50 bg-sage/10" : "border-white/8 bg-white/3 hover:border-white/20")}>
-                <Globe className={cn("mt-0.5 h-5 w-5 shrink-0", !isPrivate ? "text-sage" : "text-faint")} />
+                className={cn("flex w-full items-start gap-3.5 rounded-2xl border p-4.5 text-left transition-all", !isPrivate ? "border-accent/50 bg-accent/10" : "border-white/8 bg-white/3 hover:border-white/20")}>
+                <Globe className={cn("mt-0.5 h-5 w-5 shrink-0", !isPrivate ? "text-accent" : "text-faint")} />
                 <span>
-                  <span className="flex items-center gap-2 text-sm font-bold text-white/90">Public profile {!isPrivate && <CircleCheck className="h-4 w-4 text-sage" />}</span>
+                  <span className="flex items-center gap-2 text-sm font-bold text-white/90">Public profile {!isPrivate && <CircleCheck className="h-4 w-4 text-accent" />}</span>
                   <span className="text-dim mt-1 block text-[13px] leading-relaxed">Anyone can view the profile and posts, and follow instantly.</span>
                 </span>
               </button>
               <button type="button" onClick={() => setIsPrivate(true)}
-                className={cn("flex w-full items-start gap-3.5 rounded-2xl border p-4.5 text-left transition-all", isPrivate ? "border-sage/50 bg-sage/10" : "border-white/8 bg-white/3 hover:border-white/20")}>
-                <Lock className={cn("mt-0.5 h-5 w-5 shrink-0", isPrivate ? "text-sage" : "text-faint")} />
+                className={cn("flex w-full items-start gap-3.5 rounded-2xl border p-4.5 text-left transition-all", isPrivate ? "border-accent/50 bg-accent/10" : "border-white/8 bg-white/3 hover:border-white/20")}>
+                <Lock className={cn("mt-0.5 h-5 w-5 shrink-0", isPrivate ? "text-accent" : "text-faint")} />
                 <span>
-                  <span className="flex items-center gap-2 text-sm font-bold text-white/90">Private profile {isPrivate && <CircleCheck className="h-4 w-4 text-sage" />}</span>
+                  <span className="flex items-center gap-2 text-sm font-bold text-white/90">Private profile {isPrivate && <CircleCheck className="h-4 w-4 text-accent" />}</span>
                   <span className="text-dim mt-1 block text-[13px] leading-relaxed">Follow requests require your approval. Only approved followers see posts.</span>
                 </span>
               </button>
@@ -288,6 +307,28 @@ export function OnboardingWizard({ defaultCity, hasPets }: { defaultCity: string
         <button type="button" onClick={() => setStep(3)} className="text-faint hover:text-white/60 mt-4 text-xs font-medium transition-colors">
           Skip details for now
         </button>
+      )}
+
+      {avatarEditing && (
+        <ImageEditor
+          src={avatarEditing}
+          title="Adjust profile photo"
+          aspects={[{ label: "Avatar", value: 1 }]}
+          shape="circle"
+          outputSize={512}
+          onConfirm={(blob) => {
+            const file = new File([blob], "avatar-adjusted.jpg", { type: "image/jpeg" });
+            setAvatarFile(file);
+            setAvatarPreview(URL.createObjectURL(file));
+            URL.revokeObjectURL(avatarEditing);
+            setAvatarEditing(null);
+            toast.success("Profile photo adjusted.");
+          }}
+          onCancel={() => {
+            URL.revokeObjectURL(avatarEditing);
+            setAvatarEditing(null);
+          }}
+        />
       )}
     </main>
   );

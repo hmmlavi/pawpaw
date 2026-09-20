@@ -35,7 +35,7 @@ export default async function HomePage() {
         <header className="mb-4 animate-rise">
           <p className="text-faint text-[11px] font-semibold uppercase tracking-[0.18em]">{greeting}</p>
           <h1 className="card-title mt-1 text-[26px] font-bold leading-tight text-white/95">
-            {pet.name}<span className="text-sage">'s world</span>
+            {pet.name}<span className="text-accent">'s world</span>
           </h1>
           <p className="text-dim text-sm">{pet.city} · managed by {ctx.user.displayName}</p>
         </header>
@@ -66,7 +66,7 @@ export default async function HomePage() {
               actionLabel="Discover pets"
             />
           ) : (
-            feed.map((post) => <PostCard key={post.id} post={post} me={me} />)
+            feed.map((post) => <PostCard key={post.id} post={post} me={me} meOwner={ctx.user.displayName} />)
           )}
         </div>
       </div>
@@ -76,14 +76,14 @@ export default async function HomePage() {
         {/* AI quick access */}
         <Link href="/ai" className="glass-deep glass-sheen glass-hover group block overflow-hidden rounded-3xl p-5 animate-rise" style={{ animationDelay: "60ms" }}>
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky/25 to-sage/15 border border-white/10">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky/25 to-accent/15 border border-white/10">
               <Sparkles className="h-5 w-5 text-sky" />
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-bold text-white/92">Ask the pet assistant</p>
               <p className="text-faint text-xs">Health · behavior · training · nutrition</p>
             </div>
-            <ArrowRight className="text-faint h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1 group-hover:text-sage" />
+            <ArrowRight className="text-faint h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1 group-hover:text-accent" />
           </div>
           <div className="mt-3.5 flex flex-wrap gap-1.5">
             {[`Is chocolate safe for ${pet.animalType === "dog" ? "dogs" : "my pet"}?`, "Leash training basics", "How much sleep?"].map((q) => (
@@ -178,7 +178,7 @@ export default async function HomePage() {
             <span className="text-faint text-[10px] leading-snug">Private records for {pet.name}</span>
           </Link>
           <Link href="/services?cat=clinic" className="glass glass-hover flex flex-col gap-2 rounded-2xl p-3.5">
-            <Stethoscope className="h-4.5 w-4.5 text-sage" />
+            <Stethoscope className="h-4.5 w-4.5 text-accent" />
             <span className="text-xs font-bold text-white/85">Find a vet</span>
             <span className="text-faint text-[10px] leading-snug">Clinics in {pet.city || "your city"}</span>
           </Link>

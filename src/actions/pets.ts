@@ -127,6 +127,8 @@ export async function updatePetAction(petId: string, formData: FormData): Promis
     const saved = await saveUploadedFile(cover, user.id);
     if ("error" in saved) return { ok: false, error: saved.error };
     updates.coverFileId = saved.id;
+  } else if (formData.get("removeCover") === "true") {
+    updates.coverFileId = null;
   }
   if (updates.name !== undefined) {
     const n = String(updates.name);

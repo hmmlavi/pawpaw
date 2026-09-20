@@ -10,8 +10,8 @@ export function AuthShell({ children, title, sub }: { children: React.ReactNode;
   return (
     <main className="relative flex min-h-dvh flex-col items-center justify-center px-5 py-12">
       <Link href="/" className="mb-8 flex items-center gap-2.5 animate-rise">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sage/40 to-sky/25 border border-white/15">
-          <PawPrint className="h-4.5 w-4.5 text-sage" />
+        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent/40 to-sky/25 border border-white/15">
+          <PawPrint className="h-4.5 w-4.5 text-accent" />
         </span>
         <span className="font-display text-xl font-bold tracking-tight">Pawkind</span>
       </Link>
@@ -65,7 +65,7 @@ export function LoginForm() {
         {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
       </button>
       <p className="text-faint pt-1 text-center text-[13px]">
-        New to Pawkind? <Link href="/register" className="text-sage hover:text-sage/80 font-semibold transition-colors">Create an account</Link>
+        New to Pawkind? <Link href="/register" className="text-accent hover:text-accent/80 font-semibold transition-colors">Create an account</Link>
       </p>
     </form>
   );
@@ -119,7 +119,7 @@ export function RegisterForm() {
         {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create account"}
       </button>
       <p className="text-faint pt-1 text-center text-[13px]">
-        Already joined? <Link href="/login" className="text-sage hover:text-sage/80 font-semibold transition-colors">Sign in</Link>
+        Already joined? <Link href="/login" className="text-accent hover:text-accent/80 font-semibold transition-colors">Sign in</Link>
       </p>
     </form>
   );

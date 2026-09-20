@@ -11,6 +11,8 @@
   --color-mist-2: #ecebe6;
   --color-sage: #8fb99a;
   --color-sage-deep: #5f8a6c;
+  --color-accent: #8fb9dc;
+  --color-accent-deep: #5f87ad;
   --color-sky: #8fb6d9;
   --color-sand: #d8c9ae;
   --color-clay: #c98f7a;
@@ -56,9 +58,9 @@
   to { background-position: 200% 0; }
 }
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(143, 185, 154, 0.35); }
-  70% { box-shadow: 0 0 0 12px rgba(143, 185, 154, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(143, 185, 154, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(143, 185, 220, 0.35); }
+  70% { box-shadow: 0 0 0 12px rgba(143, 185, 220, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(143, 185, 220, 0); }
 }
 
 html {
@@ -75,7 +77,7 @@ body {
 }
 
 ::selection {
-  background: rgba(143, 185, 154, 0.35);
+  background: rgba(143, 185, 220, 0.35);
 }
 
 /* ─── Scrollbars ─────────────────────────────── */
@@ -144,9 +146,9 @@ body {
 }
 .field::placeholder { color: rgba(233, 234, 230, 0.32); }
 .field:focus {
-  border-color: rgba(143, 185, 154, 0.55);
+  border-color: rgba(143, 185, 220, 0.6);
   background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 0 4px rgba(143, 185, 154, 0.12);
+  box-shadow: 0 0 0 4px rgba(143, 185, 220, 0.12);
 }
 select.field option {
   background: #16181d;
@@ -159,7 +161,7 @@ select.field option {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(233, 234, 230, 0.45);
+  color: color-mix(in srgb, var(--color-white) 46%, transparent);
   margin-bottom: 0.4rem;
 }
 
@@ -170,13 +172,13 @@ select.field option {
   justify-content: center;
   gap: 0.5rem;
   border-radius: 14px;
-  background: linear-gradient(160deg, #9ec7a8, #6f9c7d);
-  color: #0c110d;
+  background: linear-gradient(160deg, #a9cde9, #7ba7cc);
+  color: #0b1a2a;
   font-weight: 650;
   font-size: 0.875rem;
   padding: 0.65rem 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 10px 30px -8px rgba(112, 160, 124, 0.55), 0 1px 0 rgba(255, 255, 255, 0.35) inset;
+  box-shadow: 0 10px 30px -8px rgba(110, 150, 195, 0.55), 0 1px 0 rgba(255, 255, 255, 0.35) inset;
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s, filter 0.25s;
   cursor: pointer;
 }
@@ -230,9 +232,9 @@ select.field option {
 }
 .chip:hover { background: rgba(255, 255, 255, 0.09); color: #fff; }
 .chip[data-active="true"] {
-  background: rgba(143, 185, 154, 0.16);
-  border-color: rgba(143, 185, 154, 0.45);
-  color: #b9dcc2;
+  background: rgba(143, 185, 220, 0.16);
+  border-color: rgba(143, 185, 220, 0.45);
+  color: #bcd7f2;
 }
 
 /* ─── Ambient background ─────────────────────── */
@@ -297,11 +299,11 @@ select.field option {
 }
 
 /* ─── Misc ───────────────────────────────────── */
-.text-dim { color: rgba(233, 234, 230, 0.55); }
-.text-faint { color: rgba(233, 234, 230, 0.36); }
+.text-dim { color: color-mix(in srgb, var(--color-white) 62%, transparent); }
+.text-faint { color: color-mix(in srgb, var(--color-white) 42%, transparent); }
 .font-display { font-family: var(--font-display); }
 
-.divider { height: 1px; background: rgba(255, 255, 255, 0.07); }
+.divider { height: 1px; background: color-mix(in srgb, var(--color-white) 9%, transparent); }
 
 .card-title {
   font-family: var(--font-display);
@@ -320,10 +322,10 @@ select.field option {
 
 /* Dock indicator glow */
 .dock-active {
-  background: rgba(143, 185, 154, 0.16);
-  border-color: rgba(143, 185, 154, 0.4) !important;
-  color: #c4e3cc !important;
-  box-shadow: 0 6px 22px -6px rgba(143, 185, 154, 0.4);
+  background: rgba(143, 185, 220, 0.16);
+  border-color: rgba(143, 185, 220, 0.4) !important;
+  color: #c3d9f2 !important;
+  box-shadow: 0 6px 22px -6px rgba(143, 185, 220, 0.4);
 }
 
 /* Reels scroll snap */
@@ -350,6 +352,182 @@ select.field option {
   100% { transform: scale(1); opacity: 0; }
 }
 .like-burst { animation: like-burst 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Prevent iOS auto-zoom on focus + keep fields readable on small screens */
+@media (max-width: 640px) {
+  .field {
+    font-size: 16px;
+  }
+}
+
+/* Scoped “dark surface” — content rendered on photos/video/dark overlays keeps
+   the dark-theme palette even when the app is in light mode. Brand + white
+   utility classes inside this scope resolve to their dark values. */
+.on-dark {
+  --color-white: #ffffff;
+  --color-sage: #8fb99a;
+  --color-sage-deep: #5f8a6c;
+  --color-accent: #8fb9dc;
+  --color-accent-deep: #5f87ad;
+  --color-sky: #8fb6d9;
+  --color-sand: #d8c9ae;
+  --color-clay: #c98f7a;
+}
+
+/* ─── Light theme ─────────────────────────────────
+   Dark is the default (base styles above). When data-theme="light" is set on
+   <html>, design tokens remap so every white/* utility, glass surface, input
+   and accent adapts consistently across all screens. */
+[data-theme="light"] {
+  --color-white: #20262d;
+  --color-ink-2: #eceae3;
+  --color-ink-3: #e1dfd7;
+  --color-sage: #4e7d5c;
+  --color-sage-deep: #3c6448;
+  --color-accent: #4a7cab;
+  --color-accent-deep: #38648f;
+  --color-sky: #4e7ca6;
+  --color-sand: #8a7648;
+  --color-clay: #a2593f;
+}
+
+[data-theme="light"] body {
+  background: #f1efe9;
+  color: #22282e;
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(74, 124, 171, 0.3);
+}
+
+[data-theme="light"] * {
+  scrollbar-color: rgba(32, 38, 45, 0.22) transparent;
+}
+[data-theme="light"] *::-webkit-scrollbar-thumb {
+  background: rgba(32, 38, 45, 0.2);
+}
+
+[data-theme="light"] .glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.6));
+  border-color: rgba(32, 38, 45, 0.09);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 12px 40px -12px rgba(60, 70, 85, 0.25);
+}
+[data-theme="light"] .glass-deep {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.88), rgba(248, 247, 243, 0.78));
+  border-color: rgba(32, 38, 45, 0.08);
+  box-shadow: 0 24px 70px -20px rgba(60, 70, 85, 0.3);
+}
+[data-theme="light"] .glass-hair {
+  background: rgba(32, 38, 45, 0.05);
+  border-color: rgba(32, 38, 45, 0.09);
+}
+[data-theme="light"] .glass-sheen::before {
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.55), transparent 30%);
+}
+[data-theme="light"] .glass-hover:hover {
+  border-color: rgba(32, 38, 45, 0.16);
+  box-shadow: 0 18px 50px -16px rgba(60, 70, 85, 0.3);
+}
+
+[data-theme="light"] .field {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(32, 38, 45, 0.14);
+  color: #22282e;
+}
+[data-theme="light"] .field::placeholder {
+  color: rgba(34, 40, 46, 0.4);
+}
+[data-theme="light"] .field:focus {
+  border-color: rgba(74, 124, 171, 0.6);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(74, 124, 171, 0.14);
+}
+[data-theme="light"] select.field option {
+  background: #ffffff;
+  color: #22282e;
+}
+
+[data-theme="light"] .btn-ghost {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(32, 38, 45, 0.12);
+  color: #2b3238;
+}
+[data-theme="light"] .btn-ghost:hover {
+  background: #ffffff;
+  border-color: rgba(32, 38, 45, 0.2);
+}
+[data-theme="light"] .btn-danger {
+  background: rgba(162, 89, 63, 0.1);
+  border-color: rgba(162, 89, 63, 0.4);
+  color: #96452f;
+}
+[data-theme="light"] .btn-danger:hover {
+  background: rgba(162, 89, 63, 0.18);
+}
+
+[data-theme="light"] .chip {
+  background: rgba(32, 38, 45, 0.05);
+  border-color: rgba(32, 38, 45, 0.1);
+  color: rgba(34, 40, 46, 0.75);
+}
+[data-theme="light"] .chip:hover {
+  background: rgba(32, 38, 45, 0.09);
+  color: #14181c;
+}
+[data-theme="light"] .chip[data-active="true"] {
+  background: rgba(74, 124, 171, 0.14);
+  border-color: rgba(74, 124, 171, 0.5);
+  color: #38648f;
+}
+
+[data-theme="light"] .ambient {
+  background:
+    radial-gradient(1200px 800px at 85% -10%, rgba(74, 124, 171, 0.1), transparent 60%),
+    radial-gradient(1000px 700px at -10% 110%, rgba(78, 125, 92, 0.1), transparent 60%),
+    radial-gradient(700px 500px at 55% 55%, rgba(138, 118, 72, 0.07), transparent 65%),
+    linear-gradient(180deg, #f2f1ec 0%, #e9e7e0 100%);
+}
+[data-theme="light"] .ambient-blob.a {
+  background: radial-gradient(circle, rgba(78, 125, 92, 0.14), transparent 65%);
+}
+[data-theme="light"] .ambient-blob.b {
+  background: radial-gradient(circle, rgba(74, 124, 171, 0.12), transparent 65%);
+}
+[data-theme="light"] .ambient-blob.c {
+  background: radial-gradient(circle, rgba(138, 118, 72, 0.1), transparent 65%);
+}
+
+[data-theme="light"] .skeleton {
+  background: linear-gradient(100deg, rgba(32, 38, 45, 0.06) 40%, rgba(32, 38, 45, 0.12) 50%, rgba(32, 38, 45, 0.06) 60%);
+  background-size: 200% 100%;
+}
+
+[data-theme="light"] .dock-active {
+  background: rgba(74, 124, 171, 0.16);
+  border-color: rgba(74, 124, 171, 0.45) !important;
+  color: #2f557d !important;
+  box-shadow: 0 6px 22px -6px rgba(74, 124, 171, 0.35);
+}
+
+[data-theme="light"] .modal-veil {
+  background: rgba(70, 76, 88, 0.42);
+}
+
+/* Touch-drag surfaces (image editor viewport) */
+.no-touch {
+  touch-action: none;
+}
+
+/* Text on solid accent/sand surfaces — flips to white when those tokens
+   darken in light mode so contrast holds in both themes. */
+.text-on-accent { color: #0b1a2a; }
+.text-on-accent-soft { color: rgba(11, 26, 42, 0.78); }
+.text-on-accent-faint { color: rgba(11, 26, 42, 0.6); }
+.text-on-sand { color: #0b0c0e; }
+[data-theme="light"] .text-on-accent { color: #ffffff; }
+[data-theme="light"] .text-on-accent-soft { color: rgba(255, 255, 255, 0.82); }
+[data-theme="light"] .text-on-accent-faint { color: rgba(255, 255, 255, 0.68); }
+[data-theme="light"] .text-on-sand { color: #ffffff; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

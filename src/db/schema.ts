@@ -148,6 +148,17 @@ export const comments = pgTable(
   (t) => [index("comments_post_idx").on(t.postId)],
 );
 
+export const commentLikes = pgTable(
+  "comment_likes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    petId: uuid("pet_id").notNull().references(() => pets.id, { onDelete: "cascade" }),
+    commentId: uuid("comment_id").notNull().references(() => comments.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("comment_likes_pair_idx").on(t.petId, t.commentId)],
+);
+
 export const saves = pgTable(
   "saves",
   {

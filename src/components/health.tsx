@@ -20,12 +20,12 @@ const KIND_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
 };
 
 const KIND_TINT: Record<string, string> = {
-  vaccination: "text-sage bg-sage/12 border-sage/25",
+  vaccination: "text-accent bg-accent/12 border-accent/25",
   medication: "text-sky bg-sky/12 border-sky/25",
   allergy: "text-clay bg-clay/12 border-clay/25",
   vet_visit: "text-sand bg-sand/12 border-sand/25",
   document: "text-white/70 bg-white/8 border-white/15",
-  weight: "text-sage bg-sage/12 border-sage/25",
+  weight: "text-accent bg-accent/12 border-accent/25",
   note: "text-white/70 bg-white/8 border-white/15",
 };
 
@@ -64,7 +64,7 @@ function WeightChart({ weights }: { weights: { date: string; kg: number }[] }) {
       </svg>
       <div className="flex justify-between text-[10px] text-white/45">
         <span>{new Date(weights[0].date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-        <span className="font-bold text-sage">{weights[weights.length - 1].kg} kg now</span>
+        <span className="font-bold text-accent">{weights[weights.length - 1].kg} kg now</span>
         <span>{new Date(weights[weights.length - 1].date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
       </div>
     </div>
@@ -96,8 +96,8 @@ export function HealthVault({ petName, records }: { petName: string; records: He
     <div>
       {/* privacy banner */}
       <div className="glass glass-sheen mb-5 flex items-center gap-3 rounded-3xl p-4 animate-rise">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sage/15 border border-sage/30">
-          <Lock className="h-4.5 w-4.5 text-sage" />
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent/15 border border-accent/30">
+          <Lock className="h-4.5 w-4.5 text-accent" />
         </span>
         <p className="text-dim text-xs leading-relaxed">
           The vault is <span className="font-bold text-white/85">private by default</span> — only you can see {petName}'s records.
@@ -127,7 +127,7 @@ export function HealthVault({ petName, records }: { petName: string; records: He
       {weights.length > 0 && (
         <section className="glass glass-sheen mb-5 animate-rise rounded-3xl p-4.5">
           <div className="flex items-center gap-2">
-            <Scale className="h-4 w-4 text-sage" />
+            <Scale className="h-4 w-4 text-accent" />
             <h2 className="text-sm font-bold text-white/90">Weight trend</h2>
           </div>
           {weights.length >= 2 ? (
@@ -141,7 +141,7 @@ export function HealthVault({ petName, records }: { petName: string; records: He
       {/* records */}
       {shown.length === 0 ? (
         <div className="glass glass-sheen animate-rise rounded-3xl p-12 text-center">
-          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-clay/18 to-sage/12 border border-white/10">
+          <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-clay/18 to-accent/12 border border-white/10">
             <Stethoscope className="h-6 w-6 text-clay/80" />
           </span>
           <h3 className="card-title text-lg font-bold text-white/90">{petName}'s health story begins here</h3>
@@ -201,7 +201,7 @@ export function HealthVault({ petName, records }: { petName: string; records: He
                     return (
                       <button key={k.value} type="button" onClick={() => setKind(k.value)}
                         className={cn("flex flex-col items-center gap-1.5 rounded-2xl border px-1 py-2.5 transition-all",
-                          kind === k.value ? "border-sage/45 bg-sage/12 text-sage" : "border-white/8 bg-white/3 text-white/55 hover:border-white/18")}>
+                          kind === k.value ? "border-accent/45 bg-accent/12 text-accent" : "border-white/8 bg-white/3 text-white/55 hover:border-white/18")}>
                         <Icon className="h-4 w-4" />
                         <span className="text-[10px] font-bold leading-none">{k.label}</span>
                       </button>

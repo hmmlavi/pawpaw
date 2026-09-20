@@ -16,6 +16,7 @@ export function ProfileTabs({
   tagged,
   saved,
   me,
+  meOwner,
   viewerOwns,
   name,
 }: {
@@ -24,6 +25,7 @@ export function ProfileTabs({
   tagged: FeedPost[];
   saved: FeedPost[];
   me: PetLite;
+  meOwner: string;
   viewerOwns: boolean;
   name: string;
 }) {
@@ -50,7 +52,7 @@ export function ProfileTabs({
           <button key={t.id} onClick={() => setTab(t.id)}
             className={cn(
               "flex flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-xs font-bold transition-all sm:text-sm",
-              tab === t.id ? "bg-sage/15 text-sage shadow-[0_6px_20px_-6px_rgba(143,185,154,0.45)]" : "text-white/50 hover:bg-white/5 hover:text-white/85",
+              tab === t.id ? "bg-accent/15 text-accent shadow-[0_6px_20px_-6px_rgba(143,185,220,0.45)]" : "text-white/50 hover:bg-white/5 hover:text-white/85",
             )}>
             <t.icon className="h-4 w-4" />
             <span className="hidden sm:inline">{t.label}</span>
@@ -62,7 +64,7 @@ export function ProfileTabs({
         <EmptyState icon={tab === "saved" ? Bookmark : Feather} title={empties[tab].title} body={empties[tab].body} />
       ) : (
         <div className="mx-auto max-w-xl space-y-5">
-          {data[tab].map((post) => <PostCard key={post.id} post={post} me={me} />)}
+          {data[tab].map((post) => <PostCard key={post.id} post={post} me={me} meOwner={meOwner} />)}
         </div>
       )}
     </div>

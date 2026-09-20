@@ -41,7 +41,7 @@ function ReelSlide({ post, me, active }: { post: FeedPost; me: PetLite; active: 
 
   return (
     <div className="relative flex h-full items-center justify-center">
-      <div className="relative h-full max-h-full w-full overflow-hidden bg-black sm:h-auto sm:max-h-[82dvh] sm:aspect-[9/16] sm:w-auto sm:rounded-[26px] sm:border sm:border-white/10">
+      <div className="on-dark relative h-full max-h-full w-full overflow-hidden bg-black sm:h-auto sm:max-h-[82dvh] sm:aspect-[9/16] sm:w-auto sm:rounded-[26px] sm:border sm:border-white/10">
         {isVideo ? (
           <video
             ref={videoRef}
